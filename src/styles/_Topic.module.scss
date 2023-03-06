@@ -1,0 +1,62 @@
+.topic {
+  background-color: #faebd7;
+  position: relative;
+  .background {
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: contain;
+    min-height: 100vh;
+    background-image: url(https://resourcesk.bkt.net.vn/plugins/game/GameFlashVocab/table.png);
+  }
+  .icon {
+    position: absolute;
+    top: 5%;
+    left: 3%;
+    width: 40px;
+    height: 40px;
+    color: #f0f8ff;
+    background-color: #570861;
+    display: flex;
+    border-radius: 50%;
+    align-items: center;
+    justify-content: center;
+    font-size: 28px;
+  }
+  .container {
+    width: 100%;
+    max-width: 810px;
+    margin: 0 auto;
+  }
+  .title {
+    color: #570861;
+    margin: 0;
+    text-align: center;
+    font-size: 50px;
+    font-weight: 800;
+    padding: 20px 0;
+    text-shadow: -2px -2px #fff;
+  }
+  .content {
+    display: flex;
+    gap: 20px;
+    padding: 10px;
+    overflow-x: scroll;
+    flex-direction: column;
+    flex-wrap: wrap;
+    height: 540px;
+  }
+  .box {
+    background-size: cover;
+    height: 240px;
+    width: 240px;
+    text-align: center;
+    position: relative;
+    h3 {
+      position: relative;
+      bottom: -80px;
+    }
+    span:nth-child(3){
+      order: 1;
+    }
+  }
+}
