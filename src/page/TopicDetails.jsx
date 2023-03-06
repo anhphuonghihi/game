@@ -10,23 +10,14 @@ import fail1 from "../asset/music/fail.mp3";
 import success1 from "../asset/music/success.mp3";
 const cx = classNames.bind(styles);
 const TopicDetails = () => {
-  const [one, setOne] = useState({
-    test1: "",
-    test2: "",
-    test3: "",
-  });
+  const [one, setOne] = useState({});
   let { id } = useParams();
   const navigator = useNavigate();
   const dispatch = useDispatch();
+  const data = useSelector((state) => state.topics.vocaByIDTopic);
   useEffect(() => {
     dispatch(fetchVocaByIDTopic(id));
-    setOne({
-      test1: "",
-      test2: "",
-      test3: "",
-    });
-  }, []);
-  const data = useSelector((state) => state.topics.vocaByIDTopic);
+  }, [dispatch, id]);
 
   const onHome = () => {
     navigator("/");
@@ -34,16 +25,12 @@ const TopicDetails = () => {
 
   const [success, setSuccess] = useState("");
   const landedOn = (e) => {
-    if (e.dropData.id === 1) {
-      setOne({ ...one, test1: e.dropData.img });
-    }
-    if (e.dropData.id === 2) {
-      setOne({ ...one, test2: e.dropData.img });
-    }
-    if (e.dropData.id === 3) {
-      setOne({ ...one, test3: e.dropData.img });
+    if (e.dropData.id === e.dragData.id) {
+      setOne({ ...one, ["id" + e.dropData.id]: e.dropData.img });
+      setSuccess(true);
     }
   };
+  console.log(one);
   const oneArr = Object.values(one);
   let count = 0;
   oneArr.forEach((item, index) => {
@@ -52,18 +39,14 @@ const TopicDetails = () => {
       count = count + 1;
     }
   });
-  const [code, setCode] = useState(3);
 
   const dropped = (e) => {
-    // e.containerElem.style.visibility = "hidden";
-  };
-  const onDragStart = (e) => {
-    setCode(code - 1);
+    e.containerElem.style.visibility = "hidden";
   };
 
   const [countSuccess, setCountSuccess] = useState(false);
   const onDragEndFail = (e) => {
-    console.log("onDragEndFail");
+    console.log(e);
     if (countSuccess) {
       var audio = new Audio(success1);
       audio.play();
@@ -81,22 +64,53 @@ const TopicDetails = () => {
     console.log("onDragLeave");
     setCountSuccess(false);
   };
+  const onDrag = () => {
+    setSuccess("");
+  };
   const [start, setStart] = useState(0);
   const [end, setEnd] = useState(3);
-  const len = data.length / 7;
+  const [img, setImage] = useState(
+    "https://resourcesk.bkt.net.vn/plugins/game/GameFlashVocab/star_4.png"
+  );
+  const len = data.length / 3;
+  useEffect(() => {
+    if (count === 3) {
+      setStart(3);
+      setEnd(6);
+    }
+    for (let index = 0; index < len; index++) {
+      if (count === len) {
+        setImage(
+          "https://resourcesk.bkt.net.vn/plugins/game/GameFlashVocab/star_3.png"
+        );
+      }
+      if (count === len * 2) {
+        setImage(
+          "https://resourcesk.bkt.net.vn/plugins/game/GameFlashVocab/star_2.png"
+        );
+      }
+      if (count === len * 3) {
+        setImage(
+          "https://resourcesk.bkt.net.vn/plugins/game/GameFlashVocab/star_1.png"
+        );
+        navigator(`/topic`);
+      }
+    }
+  }, [count, len, navigator]);
+
   return (
     <div className={cx("topic")}>
       <button className={cx("icon")} onClick={onHome}>
         <IoHome />
       </button>
       <div className={cx("row")}>
-        {data.slice(start, end).map((item, index) => (
+        {data.map((item, index) => (
           <DragDropContainer
             targetKey={item.name}
             onDrop={landedOn}
+            onDrag={onDrag}
             onDragEnd={onDragEndFail}
-            dragData={{ img: item.name, id: index + 1 }}
-            onDragStart={() => onDragStart(item.name)}
+            dragData={{ img: item.name, id: item.idvocabulary + 1 }}
             key={index}
           >
             <div className={cx("box-img")}>
@@ -108,9 +122,9 @@ const TopicDetails = () => {
           </DragDropContainer>
         ))}
       </div>
+
       <div className={cx("row")}>
-        {data.slice(start, end).map((item, index) => {
-          console.log(one[0]);
+        {data.map((item, index) => {
           return (
             <DropTarget
               key={index}
@@ -118,13 +132,12 @@ const TopicDetails = () => {
               onHit={dropped}
               onDragEnter={onDragEnter}
               onDragLeave={onDragLeave}
-              dropData={{ img: item.name, id: index + 1 }}
+              dropData={{ img: item.name, id: item.idvocabulary + 1 }}
             >
-              {Object.values(one)[index] !== item.name && (
+              {oneArr[index] !== item.name && (
                 <div className={cx("box-text")}>{item.name}</div>
               )}
-
-              {Object.values(one)[index] === item.name && (
+              {oneArr[index] === item.name && (
                 <div className={cx("box-img")}>
                   <img
                     src={`https://resourcesk.bkt.net.vn/ImagesPNG/${item.name}.png`}
@@ -148,10 +161,7 @@ const TopicDetails = () => {
             {success === null && ""}
           </div>
           <div className={cx("score__image")}>
-            <img
-              src="https://resourcesk.bkt.net.vn/plugins/game/GameFlashVocab/star_4.png"
-              alt=""
-            />
+            <img src={img} alt="" />
           </div>
           <div className={cx("score__border")}></div>
         </div>
