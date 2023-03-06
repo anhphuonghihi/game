@@ -41,7 +41,7 @@ const TopicDetails = () => {
   });
 
   const dropped = (e) => {
-    e.containerElem.style.visibility = "hidden";
+    // e.containerElem.style.visibility = "hidden";
   };
 
   const [countSuccess, setCountSuccess] = useState(false);
@@ -74,9 +74,11 @@ const TopicDetails = () => {
   );
   const len = data.length / 3;
   useEffect(() => {
-    if (count === 3) {
-      setStart(3);
-      setEnd(6);
+    for (let index = 1; index < len; index++) {
+      if (count === 3 * index) {
+        setStart(3 * index);
+        setEnd(3 * index + 3);
+      }
     }
     for (let index = 0; index < len; index++) {
       if (count === len) {
@@ -104,9 +106,9 @@ const TopicDetails = () => {
         <IoHome />
       </button>
       <div className={cx("row")}>
-        {data.map((item, index) => (
+        {data.slice(start, end).map((item, index) => (
           <DragDropContainer
-            targetKey={item.name}
+            targetKey="a"
             onDrop={landedOn}
             onDrag={onDrag}
             onDragEnd={onDragEndFail}
@@ -124,11 +126,12 @@ const TopicDetails = () => {
       </div>
 
       <div className={cx("row")}>
-        {data.map((item, index) => {
+        {data.slice(start, end).map((item, index) => {
+          console.log(oneArr);
           return (
             <DropTarget
               key={index}
-              targetKey={item.name}
+              targetKey="a"
               onHit={dropped}
               onDragEnter={onDragEnter}
               onDragLeave={onDragLeave}
