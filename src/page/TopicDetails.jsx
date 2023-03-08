@@ -26,8 +26,7 @@ const TopicDetails = () => {
   const [success, setSuccess] = useState("");
   const landedOn = (e) => {
     if (e.dropData.id === e.dragData.id) {
-      setOne({ ...one, ["id" + e.dropData.id]: e.dropData.img });
-      setSuccess(true);
+      setOne({ ...one, [e.dropData.id]: e.dropData.img });
     }
   };
   console.log(one);
@@ -41,7 +40,7 @@ const TopicDetails = () => {
   });
 
   const dropped = (e) => {
-    // e.containerElem.style.visibility = "hidden";
+    e.containerElem.style.visibility = "hidden";
   };
 
   const [countSuccess, setCountSuccess] = useState(false);
@@ -50,9 +49,11 @@ const TopicDetails = () => {
     if (countSuccess) {
       var audio = new Audio(success1);
       audio.play();
+      setSuccess(true);
     } else {
       var audio = new Audio(fail1);
       audio.play();
+      setSuccess(false);
     }
     setCountSuccess(false);
   };
@@ -64,7 +65,8 @@ const TopicDetails = () => {
     console.log("onDragLeave");
     setCountSuccess(false);
   };
-  const onDrag = () => {
+  const onDrag = (e) => {};
+  const onDragStart = (e) => {
     setSuccess("");
   };
   const [start, setStart] = useState(0);
@@ -72,12 +74,19 @@ const TopicDetails = () => {
   const [img, setImage] = useState(
     "https://resourcesk.bkt.net.vn/plugins/game/GameFlashVocab/star_4.png"
   );
+  const [tranfrom, setTranfrom] = useState(0);
+  console.log(tranfrom);
   const len = data.length / 3;
   useEffect(() => {
     for (let index = 1; index < len; index++) {
       if (count === 3 * index) {
         setStart(3 * index);
         setEnd(3 * index + 3);
+        if (tranfrom === 0) {
+          setTranfrom(870);
+        } else {
+          setTranfrom(870 * index);
+        }
       }
     }
     for (let index = 0; index < len; index++) {
@@ -98,59 +107,62 @@ const TopicDetails = () => {
         navigator(`/topic`);
       }
     }
-  }, [count, len, navigator]);
-
+  }, [count, len, navigator, tranfrom]);
+  const styles = {
+    transform: `translateX(-${tranfrom}px)`,
+  };
   return (
     <div className={cx("topic")}>
       <button className={cx("icon")} onClick={onHome}>
         <IoHome />
       </button>
-      <div className={cx("row")}>
-        {data.slice(start, end).map((item, index) => (
-          <DragDropContainer
-            targetKey="a"
-            onDrop={landedOn}
-            onDrag={onDrag}
-            onDragEnd={onDragEndFail}
-            dragData={{ img: item.name, id: item.idvocabulary + 1 }}
-            key={index}
-          >
-            <div className={cx("box-img")}>
-              <img
-                src={`https://resourcesk.bkt.net.vn/ImagesPNG/${item.name}.png`}
-                alt=""
-              />
-            </div>
-          </DragDropContainer>
-        ))}
-      </div>
-
-      <div className={cx("row")}>
-        {data.slice(start, end).map((item, index) => {
-          console.log(oneArr);
-          return (
-            <DropTarget
+      <div className={cx("background")}>
+        <div className={cx("row")} style={styles}>
+          {data.map((item, index) => (
+            <DragDropContainer
+              targetKey={item.name}
+              onDrop={landedOn}
+              onDrag={onDrag}
+              onDragStart={onDragStart}
+              onDragEnd={onDragEndFail}
+              dragData={{ img: item.name, id: item.idvocabulary + 1 }}
               key={index}
-              targetKey="a"
-              onHit={dropped}
-              onDragEnter={onDragEnter}
-              onDragLeave={onDragLeave}
-              dropData={{ img: item.name, id: item.idvocabulary + 1 }}
             >
-              {oneArr[index] !== item.name && (
-                <div className={cx("box-text")}>{item.name}</div>
-              )}
-              {oneArr[index] === item.name && (
-                <div className={cx("box-img")}>
-                  <img
-                    src={`https://resourcesk.bkt.net.vn/ImagesPNG/${item.name}.png`}
-                    alt=""
-                  />
-                </div>
-              )}
-            </DropTarget>
-          );
-        })}
+              <div className={cx("box-img")}>
+                <img
+                  src={`https://resourcesk.bkt.net.vn/ImagesPNG/${item.name}.png`}
+                  alt=""
+                />
+              </div>
+            </DragDropContainer>
+          ))}
+        </div>
+        <div className={cx("row")} style={styles}>
+          {data.map((item, index) => {
+            return (
+              <DropTarget
+                key={index}
+                targetKey={item.name}
+                onHit={dropped}
+                onDragEnter={onDragEnter}
+                onDragLeave={onDragLeave}
+                dropData={{ img: item.name, id: item.idvocabulary + 1 }}
+              >
+                {oneArr[index] !== item.name && (
+                  <div className={cx("box-text")}>{item.name}</div>
+                )}
+                {oneArr[index] === item.name && (
+                  <div className={cx("box-img")}>
+                    <img
+                      src={`https://resourcesk.bkt.net.vn/ImagesPNG/${item.name}.png`}
+                      alt=""
+                    />
+                  </div>
+                )}
+              </DropTarget>
+            );
+          })}
+        </div>
       </div>
       <div className={cx("score")}>
         <div className={cx("score__number")}>
